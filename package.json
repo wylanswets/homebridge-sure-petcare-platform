@@ -26,5 +26,6 @@
   "homepage": "https://github.com/wylanswets/homebridge-sure-petcare-platform#readme",
   "dependencies": {
     "sure_petcare": "0.0.1"
-  }
+  },
+  "devDependencies": {}
 }
