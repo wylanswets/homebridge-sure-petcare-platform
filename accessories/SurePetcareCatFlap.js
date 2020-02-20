@@ -21,16 +21,27 @@ function SurePetcareCatFlap(log, accessory, device, session) {
 
 SurePetcareCatFlap.prototype = Object.create(SurePetcareCatFlap.prototype);
 
-SurePetcareCatFlap.prototype.pollStatus = function() {
-    var self = this;
-    this._getLockState(function(nothing, data) {
-        self.service
-          .getCharacteristic(Characteristic.LockTargetState)
-          .setValue(data, null, "internal");
-        self.service
-          .getCharacteristic(Characteristic.LockCurrentState)
-          .setValue(data, null, "internal");
-    });
+SurePetcareCatFlap.prototype.pollStatus = function(data) {
+    for(index in data.data.devices) {
+
+        var dev = data.data.devices[index];
+
+        if(dev.id == this.lock.id) {
+            var state = dev.status.locking.mode;
+            state = state >= 1 ? 1 : 0; //Make sure we are only 1 (locked) or 0 (unlocked).
+            this.service
+                .getCharacteristic(Characteristic.LockTargetState)
+                .setValue(state, null, "internal");
+            this.service
+                .getCharacteristic(Characteristic.LockCurrentState)
+                .setValue(state, null, "internal");
+
+            return;
+        }
+
+    }
+
+    
 }
 
 SurePetcareCatFlap.prototype._getLockState = function(callback) {

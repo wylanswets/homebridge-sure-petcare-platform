@@ -2,6 +2,7 @@ var Accessory, Service, Characteristic, UUIDGen;
 var SurePetcareApi = require('sure_petcare').SurePetcareApi;
 
 var SurePetcareCatFlap = require('./accessories/SurePetcareCatFlap');
+var SurePetcareOccupancySensor = require('./accessories/SurePetcareOccupancySensor');
 
 module.exports = function(homebridge) {
 
@@ -33,12 +34,21 @@ function SurePetcare(log, config, api) {
                 password: config.password,
                 device_id: UUIDGen.generate(config.email)
             });
-            self.PetcareApi.getDevices(function(data) {
-                var devices = data;
+            self.PetcareApi.getStatuses(function(data) {
+                var devices = data.data.devices;
                 for(var i in devices) {
                     var device = devices[i];
                     self.addAccessories(device);
                 }
+
+                if(config.pet_occupancy) {
+                    var pets = data.data.pets;
+                    for(var i in pets) {
+                        var pet = pets[i];
+                        self.addPets(pet);
+                    }
+                }
+
             });
             self.pollStatus();
         });
@@ -50,13 +60,15 @@ SurePetcare.prototype.pollStatus = function() {
     var self = this;
     var interval = self.config.poll_interval ? (self.config.poll_interval * 1000) : 30000;
     setTimeout(function() {
-        var statuses = [];
-        for(uuid in self.accessories) {
-            statuses[uuid] = false;
-            var acc = self.accessories[uuid];
-            acc.pollStatus();
-        }
-        self.pollStatus();
+        self.PetcareApi.getStatuses(function(data) {
+            for(uuid in self.accessories) {
+                var acc = self.accessories[uuid];
+                acc.pollStatus(data);
+            }
+            self.pollStatus();
+        });
+
+        
     }, interval);
 }
 
@@ -68,7 +80,7 @@ SurePetcare.prototype.addAccessories = function(device) {
     var accessory = self.accessories[uuid];
 
     switch(device.product_id) {
-        case 6: // cat flap
+        case 6: // cat flap iDSCF
             if(accessory === undefined) {
                 self.registerCatFlap(device);
             } else {
@@ -76,6 +88,23 @@ SurePetcare.prototype.addAccessories = function(device) {
             }
             break;
     }    
+}
+
+SurePetcare.prototype.addPets = function(pet) {
+    
+    // var self = this;
+    var uuid = UUIDGen.generate("PET-" + pet.id);
+        
+    //Add accessory
+    var accessory = this.accessories[uuid];
+
+    
+    if(accessory === undefined) {
+        this.registerOccupancySensor(pet);
+    } else {
+        this.accessories[uuid] = new SurePetcareOccupancySensor(this.log, (accessory instanceof SurePetcareOccupancySensor ? accessory.accessory : accessory), pet, this.PetcareApi);
+    }
+    
 }
 
 SurePetcare.prototype.registerCatFlap = function(device) {
@@ -86,6 +115,20 @@ SurePetcare.prototype.registerCatFlap = function(device) {
     acc.addService(Service.LockMechanism);
 
     this.accessories[uuid] = new SurePetcareCatFlap(this.log, acc, device, this.PetcareApi);
+
+    this.api.registerPlatformAccessories("homebridge-sure-petcare-platform", "SurePetcare", [acc]);
+
+}
+
+SurePetcare.prototype.registerOccupancySensor = function(pet) {
+
+    var uuid = UUIDGen.generate("PET-" + pet.id);
+    var name = pet.name == '' ? "Pet Occupancy" : pet.name;
+    var acc = new Accessory(name, uuid);
+
+    acc.addService(Service.OccupancySensor);
+
+    this.accessories[uuid] = new SurePetcareOccupancySensor(this.log, acc, pet, this.PetcareApi);
 
     this.api.registerPlatformAccessories("homebridge-sure-petcare-platform", "SurePetcare", [acc]);
 
