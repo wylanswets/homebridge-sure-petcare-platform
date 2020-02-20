@@ -36,7 +36,6 @@ SurePetcareOccupancySensor.prototype.pollStatus = function(data) {
 
 SurePetcareOccupancySensor.prototype._getOccupancy = function(callback) {
     var self = this;
-    console.log("getting pet status");
     this.session.getStatuses(function(data) {
 
         var pets = data.data.pets;

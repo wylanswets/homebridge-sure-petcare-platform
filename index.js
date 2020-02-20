@@ -1,7 +1,7 @@
 var Accessory, Service, Characteristic, UUIDGen;
 var SurePetcareApi = require('sure_petcare').SurePetcareApi;
 
-var SurePetcareCatFlap = require('./accessories/SurePetcareCatFlap');
+var SurePetcarePetFlap = require('./accessories/SurePetcarePetFlap');
 var SurePetcareOccupancySensor = require('./accessories/SurePetcareOccupancySensor');
 
 module.exports = function(homebridge) {
@@ -73,20 +73,26 @@ SurePetcare.prototype.pollStatus = function() {
 }
 
 SurePetcare.prototype.addAccessories = function(device) {
-    var self = this;
-    var uuid = UUIDGen.generate(device.serial_number);
-        
-    //Add accessory
-    var accessory = self.accessories[uuid];
 
     switch(device.product_id) {
         case 6: // cat flap iDSCF
+            var uuid = UUIDGen.generate(device.serial_number);
+            //Add accessory
+            var accessory = this.accessories[uuid];
             if(accessory === undefined) {
-                self.registerCatFlap(device);
+                this.registerCatFlap(device);
             } else {
-                self.accessories[uuid] = new SurePetcareCatFlap(self.log, (accessory instanceof SurePetcareCatFlap ? accessory.accessory : accessory), device, self.PetcareApi);
+                this.accessories[uuid] = new SurePetcarePetFlap(this.log, (accessory instanceof SurePetcarePetFlap ? accessory.accessory : accessory), device, this.PetcareApi);
             }
             break;
+        case 3: // Pet flap
+            var uuid = UUIDGen.generate(device.mac_address);
+            var accessory = this.accessories[uuid];
+            if(accessory === undefined) {
+                this.registerCatFlap(device);
+            } else {
+                this.accessories[uuid] = new SurePetcarePetFlap(this.log, (accessory instanceof SurePetcarePetFlap ? accessory.accessory : accessory), device, this.PetcareApi);
+            }
     }    
 }
 
@@ -108,13 +114,14 @@ SurePetcare.prototype.addPets = function(pet) {
 }
 
 SurePetcare.prototype.registerCatFlap = function(device) {
-    var uuid = UUIDGen.generate(device.serial_number);
+    var uuid_string = device.serial_number == undefined ? device.mac_address : device.serial_number;
+    var uuid = UUIDGen.generate(uuid_string);
     var name = device.name == '' ? "Pet Door" : device.name;
     var acc = new Accessory(name, uuid);
 
     acc.addService(Service.LockMechanism);
 
-    this.accessories[uuid] = new SurePetcareCatFlap(this.log, acc, device, this.PetcareApi);
+    this.accessories[uuid] = new SurePetcarePetFlap(this.log, acc, device, this.PetcareApi);
 
     this.api.registerPlatformAccessories("homebridge-sure-petcare-platform", "SurePetcare", [acc]);
 

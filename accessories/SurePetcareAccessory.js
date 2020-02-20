@@ -11,7 +11,7 @@ function SurePetcareAccessory(log, accessory, device, session) {
       accessory.context.revision = "1"
     } else {
       accessory.context.model = device.product_id;
-      accessory.context.serial = device.serial_number;
+      accessory.context.serial = device.serial_number == undefined ? device.mac_address : device.serial_number;
       accessory.context.revision = device.version;
     }
     info.setCharacteristic(global.Characteristic.Model, accessory.context.model.toString());

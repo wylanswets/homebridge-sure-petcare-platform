@@ -1,6 +1,6 @@
 var SurePetcareAccessory = require('./SurePetcareAccessory.js');
 
-function SurePetcareCatFlap(log, accessory, device, session) {
+function SurePetcarePetFlap(log, accessory, device, session) {
     SurePetcareAccessory.call(this, log, accessory, device, session);
 
     this.lock = device;
@@ -19,9 +19,9 @@ function SurePetcareCatFlap(log, accessory, device, session) {
     this.accessory.updateReachability(true);
 }
 
-SurePetcareCatFlap.prototype = Object.create(SurePetcareCatFlap.prototype);
+SurePetcarePetFlap.prototype = Object.create(SurePetcarePetFlap.prototype);
 
-SurePetcareCatFlap.prototype.pollStatus = function(data) {
+SurePetcarePetFlap.prototype.pollStatus = function(data) {
     for(index in data.data.devices) {
 
         var dev = data.data.devices[index];
@@ -44,14 +44,14 @@ SurePetcareCatFlap.prototype.pollStatus = function(data) {
     
 }
 
-SurePetcareCatFlap.prototype._getLockState = function(callback) {
+SurePetcarePetFlap.prototype._getLockState = function(callback) {
     this.session.getLockStatus(this.lock.id, function(data) {
         var locked = data.status.locking.mode > 0 ? true : false;
         callback(null, locked);
     });
 }
 
-SurePetcareCatFlap.prototype._setLockState = function(targetState, callback, context) {
+SurePetcarePetFlap.prototype._setLockState = function(targetState, callback, context) {
     if (context == "internal") return callback(null); // we set this state ourself, no need to react to it
     
     var self = this;
@@ -63,4 +63,4 @@ SurePetcareCatFlap.prototype._setLockState = function(targetState, callback, con
     });
 }
 
-module.exports = SurePetcareCatFlap;
+module.exports = SurePetcarePetFlap;
