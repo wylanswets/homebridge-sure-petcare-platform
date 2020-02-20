@@ -26,6 +26,5 @@ pet_occupancy is also optional, and will default to false. If this is true it wi
 
 ## Supports:
 * Cat Door Connect
-
-## In progress / need invite to home with one to test:
 * Pet Door Connect
+
