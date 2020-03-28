@@ -4,13 +4,13 @@ function SurePetcareAccessory(log, accessory, device, session) {
     accessory.context.manufacturer = "Sure Petcare"
     info.setCharacteristic(global.Characteristic.Manufacturer, accessory.context.manufacturer.toString());
     
-    if(device.product_id === undefined && device.gender !== undefined) {
+    if(device.product_id === undefined || device.gender !== undefined) {
       //This is a pet so do some other things instead...
       accessory.context.model = "Pet";
       accessory.context.serial = device.id;
       accessory.context.revision = "1"
     } else {
-      accessory.context.model = device.product_id;
+      accessory.context.model = device.product_id == undefined ? "Sure Petcare" : device.product_id;
       accessory.context.serial = device.serial_number == undefined ? device.mac_address : device.serial_number;
       accessory.context.revision = device.version;
     }
