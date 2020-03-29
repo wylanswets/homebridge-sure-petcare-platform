@@ -104,11 +104,12 @@ SurePetcare.prototype.addPets = function(pet) {
     //Add accessory
     var accessory = this.accessories[uuid];
 
-    
+    var occupancy_flipped = this.config.occupancy_flipped ? this.config.occupancy_flipped : false;
+
     if(accessory === undefined) {
-        this.registerOccupancySensor(pet);
+        this.registerOccupancySensor(pet, occupancy_flipped);
     } else {
-        this.accessories[uuid] = new SurePetcareOccupancySensor(this.log, (accessory instanceof SurePetcareOccupancySensor ? accessory.accessory : accessory), pet, this.PetcareApi);
+        this.accessories[uuid] = new SurePetcareOccupancySensor(this.log, (accessory instanceof SurePetcareOccupancySensor ? accessory.accessory : accessory), pet, this.PetcareApi, occupancy_flipped);
     }
     
 }
@@ -127,15 +128,15 @@ SurePetcare.prototype.registerCatFlap = function(device) {
 
 }
 
-SurePetcare.prototype.registerOccupancySensor = function(pet) {
+SurePetcare.prototype.registerOccupancySensor = function(pet, occupancy_flipped) {
 
     var uuid = UUIDGen.generate("PET-" + pet.id);
     var name = pet.name == '' ? "Pet Occupancy" : pet.name;
     var acc = new Accessory(name, uuid);
 
     acc.addService(Service.OccupancySensor);
-
-    this.accessories[uuid] = new SurePetcareOccupancySensor(this.log, acc, pet, this.PetcareApi);
+    
+    this.accessories[uuid] = new SurePetcareOccupancySensor(this.log, acc, pet, this.PetcareApi, occupancy_flipped);
 
     this.api.registerPlatformAccessories("homebridge-sure-petcare-platform", "SurePetcare", [acc]);
 
