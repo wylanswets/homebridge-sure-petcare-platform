@@ -15,7 +15,8 @@ To configure, add this to your homebridge config.json file:
             "email": "your_email@email.com",
             "password": "your_password",
             "poll_interval": 30,
-            "pet_occupancy": true
+            "pet_occupancy": true,
+            "occupancy_flipped": true
         }
     ]
 
@@ -25,6 +26,9 @@ If poll_interval it is not defined in the config it will default to 30. Adjustin
 
 #### pet_occupancy (optional)
 pet_occupancy will default to false. If this is true it will enable an occupancy sensor for each of your pets. During each "poll interval" the occupancy sensor will be updated to reflect if the app says the pet is inside or outside the house. "Occupancy Detected" means they are inside the house, "No Occupancy" means they are outside the house.
+
+#### occupancy_flipped (optional)
+occupancy_flipped will default to false. If you set this to true, the occupancy sensors state will be flipped. This means if your pet is outside, the sensor will read "occupancy detected". If a pet is inside the house occupancy will not be detected.
 
 ## Supports:
 * Cat Door Connect
