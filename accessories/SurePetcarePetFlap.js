@@ -16,6 +16,25 @@ function SurePetcarePetFlap(log, accessory, device, session) {
         .on('set', this._setLockState.bind(this))
         .on('get', this._getLockState.bind(this));
 
+    //add battery service if needed
+    this.battery = this.accessory.getService(global.Service.BatteryService);
+    if(this.battery == undefined) {
+        this.accessory.addService(global.Service.BatteryService);
+        this.battery = this.accessory.getService(global.Service.BatteryService);
+    }
+
+    this.battery
+        .getCharacteristic(global.Characteristic.BatteryLevel)
+        .on('get', this._getBatteryLevel.bind(this));
+    
+    this.battery
+        .getCharacteristic(global.Characteristic.ChargingState)
+        .on('get', this._getBatteryChargeState.bind(this));
+
+    this.battery
+        .getCharacteristic(global.Characteristic.StatusLowBattery)
+        .on('get', this._getBatteryLowLevel.bind(this));
+
     this.accessory.updateReachability(true);
 }
 
@@ -38,10 +57,7 @@ SurePetcarePetFlap.prototype.pollStatus = function(data) {
 
             return;
         }
-
     }
-
-    
 }
 
 SurePetcarePetFlap.prototype._getLockState = function(callback) {
@@ -60,6 +76,33 @@ SurePetcarePetFlap.prototype._setLockState = function(targetState, callback, con
           .getCharacteristic(Characteristic.LockCurrentState)
           .setValue(targetState, null, "internal");
         callback(null);
+    });
+}
+
+SurePetcarePetFlap.prototype._getBatteryLevel = function(callback) {
+    var self = this;
+    this.session.getLockStatus(this.lock.id, function(data) {
+        var battery = self.session.translateBatteryToPercent(data.status.battery);
+        callback(null, battery);
+    });
+}
+
+SurePetcarePetFlap.prototype._getBatteryChargeState = function(callback) {
+    callback(2);
+}
+
+SurePetcarePetFlap.prototype._getBatteryLowLevel = function(callback) {
+    var self = this;
+    this.session.getLockStatus(this.lock.id, function(data) {
+        var battery = self.session.translateBatteryToPercent(data.status.battery);
+        var low_level = 0;
+        //See if battery is less than or equal to 25%
+        //BATTERY_LEVEL_LOW = 1;
+        //BATTERY_LEVEL_NORMAL = 0;
+        if(battery <= 25) {
+            low_level = 1;
+        }
+        callback(null, low_level);
     });
 }
 
