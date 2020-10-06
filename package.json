@@ -1,6 +1,6 @@
 {
   "name": "homebridge-sure-petcare-platform",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Enables Sure Petcare products (currently only doors) to work with Homekit. If you would like to see their other accessories supported feel free to reach out through this repo or to submit a pull request.",
   "main": "index.js",
   "scripts": {

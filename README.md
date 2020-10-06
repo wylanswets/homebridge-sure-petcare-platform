@@ -42,5 +42,8 @@ lock_mode will default to 1 if not defined. You can change this value based on t
 * Pet Door Connect
 
 ## Change Log:
+### 0.1.4 - Oct. 6, 2020
+* Wired in lock_mode to actually work becuase who needs to test code you write?
+
 ### 0.1.3 - Oct. 6, 2020
 * Added lock_mode support to specify how the pet doors would lock from homekit.

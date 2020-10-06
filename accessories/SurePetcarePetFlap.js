@@ -75,9 +75,12 @@ SurePetcarePetFlap.prototype._setLockState = function(targetState, callback, con
     var self = this;
 
     //If we override locking mode in config, use that.
-    var state = this.config.lock_mode ? this.config.lock_mode : targetState;
-
-    this.session.setLock(this.lock.id, targetState, function(data) {
+    var lock_mode = targetState;
+    if(targetState !== 0) {
+        lock_mode = this.config.lock_mode ? this.config.lock_mode : targetState;
+    }
+    
+    this.session.setLock(this.lock.id, lock_mode, function(data) {
         self.service
           .getCharacteristic(Characteristic.LockCurrentState)
           .setValue(targetState, null, "internal");
