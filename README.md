@@ -16,7 +16,8 @@ To configure, add this to your homebridge config.json file:
             "password": "your_password",
             "poll_interval": 30,
             "pet_occupancy": true,
-            "occupancy_flipped": true
+            "occupancy_flipped": true,
+            "lock_mode": 1
         }
     ]
 
@@ -30,7 +31,16 @@ pet_occupancy will default to false. If this is true it will enable an occupancy
 #### occupancy_flipped (optional)
 occupancy_flipped will default to false. If you set this to true, the occupancy sensors state will be flipped. This means if your pet is outside, the sensor will read "occupancy detected". If a pet is inside the house occupancy will not be detected.
 
+#### lock_mode (optional)
+lock_mode will default to 1 if not defined. You can change this value based on the locking mode you want. The different modes are:
+* 1 (default) - Keeps your pets inside the house, but will let them enter from outside.
+* 2 - Keeps your pets outside the house, but will let them go outside. (keeps dead lizards and mice out)
+* 3 - Locks the door in both directions. No one in, no one out. (keeps lizards and mice alive and from dying and being brought in)
+
 ## Supports:
 * Cat Door Connect
 * Pet Door Connect
 
+## Change Log:
+### 0.1.3 - Oct. 6, 2020
+* Added lock_mode support to specify how the pet doors would lock from homekit.

@@ -1,9 +1,11 @@
 var SurePetcareAccessory = require('./SurePetcareAccessory.js');
 
-function SurePetcarePetFlap(log, accessory, device, session) {
+function SurePetcarePetFlap(log, accessory, device, session, config) {
     SurePetcareAccessory.call(this, log, accessory, device, session);
 
     this.lock = device;
+
+    this.config = config;
 
     this.service = this.accessory.getService(global.Service.LockMechanism);
 
@@ -71,6 +73,10 @@ SurePetcarePetFlap.prototype._setLockState = function(targetState, callback, con
     if (context == "internal") return callback(null); // we set this state ourself, no need to react to it
     
     var self = this;
+
+    //If we override locking mode in config, use that.
+    var state = this.config.lock_mode ? this.config.lock_mode : targetState;
+
     this.session.setLock(this.lock.id, targetState, function(data) {
         self.service
           .getCharacteristic(Characteristic.LockCurrentState)

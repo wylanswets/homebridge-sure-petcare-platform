@@ -82,7 +82,7 @@ SurePetcare.prototype.addAccessories = function(device) {
             if(accessory === undefined) {
                 this.registerCatFlap(device);
             } else {
-                this.accessories[uuid] = new SurePetcarePetFlap(this.log, (accessory instanceof SurePetcarePetFlap ? accessory.accessory : accessory), device, this.PetcareApi);
+                this.accessories[uuid] = new SurePetcarePetFlap(this.log, (accessory instanceof SurePetcarePetFlap ? accessory.accessory : accessory), device, this.PetcareApi, this.config);
             }
             break;
         case 3: // Pet flap
@@ -91,7 +91,7 @@ SurePetcare.prototype.addAccessories = function(device) {
             if(accessory === undefined) {
                 this.registerCatFlap(device);
             } else {
-                this.accessories[uuid] = new SurePetcarePetFlap(this.log, (accessory instanceof SurePetcarePetFlap ? accessory.accessory : accessory), device, this.PetcareApi);
+                this.accessories[uuid] = new SurePetcarePetFlap(this.log, (accessory instanceof SurePetcarePetFlap ? accessory.accessory : accessory), device, this.PetcareApi, this.config);
             }
     }    
 }
@@ -122,7 +122,7 @@ SurePetcare.prototype.registerCatFlap = function(device) {
 
     acc.addService(Service.LockMechanism);
 
-    this.accessories[uuid] = new SurePetcarePetFlap(this.log, acc, device, this.PetcareApi);
+    this.accessories[uuid] = new SurePetcarePetFlap(this.log, acc, device, this.PetcareApi, this.config);
 
     this.api.registerPlatformAccessories("homebridge-sure-petcare-platform", "SurePetcare", [acc]);
 
