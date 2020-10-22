@@ -61,9 +61,11 @@ SurePetcare.prototype.pollStatus = function() {
     var interval = self.config.poll_interval ? (self.config.poll_interval * 1000) : 30000;
     setTimeout(function() {
         self.PetcareApi.getStatuses(function(data) {
-            for(uuid in self.accessories) {
-                var acc = self.accessories[uuid];
-                acc.pollStatus(data);
+            if(data != null && data.data != null) {
+                for(uuid in self.accessories) {
+                    var acc = self.accessories[uuid];
+                    acc.pollStatus(data);
+                }
             }
             self.pollStatus();
         });
