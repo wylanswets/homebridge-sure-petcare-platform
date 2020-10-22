@@ -50,10 +50,18 @@ SurePetcareOccupancySensor.prototype._getOccupancy = function(callback) {
             if(pet.id == self.sensor.id) {
                 //Pet position is 1 for inside and 2 for outside.
                 //This needs to be 0 for no occupancy and 1 for occupancy
-                var where = pet.position.where == 2 ? 0 : 1;
-                if(self.occupancy_flipped) {
-                    where = where === 1 ? 0 : 1;
+                var where;
+                if(pet.position.where != undefined) {
+                    where = pet.position.where == 2 ? 0 : 1;
+                    if(self.occupancy_flipped) {
+                        where = where === 1 ? 0 : 1;
+                    }
+                } else {
+                    where = 0;
+                    console.log(pet);
+                    console.log("Pet occupancy not found. If this error persists, consider turning off pet occupancy.");
                 }
+                
                 callback(null, where);
                 return;
             }
